@@ -27,19 +27,16 @@
                         center: userLocation
                     });
 
-                    // Marker for user's current location
                     new google.maps.Marker({
                         position: userLocation,
                         map: map,
                         title: "Your Location"
                     });
 
-                    // Fetching bowl locations
                     fetchBowlLocations(map);
-
                 }, function(error) {
                     console.error("Geolocation error:", error);
-                    const defaultLocation = { lat: 37.7749, lng: -122.4194 }; // Fallback location if geolocation fails
+                    const defaultLocation = { lat: 37.7749, lng: -122.4194 };
                     const map = new google.maps.Map(document.getElementById('map'), {
                         zoom: 12,
                         center: defaultLocation
@@ -57,7 +54,6 @@
             .then(data => {
                 const geocoder = new google.maps.Geocoder();
                 data.bowls.forEach(bowl => {
-                    // Check if address is a string and not empty
                     if (typeof bowl.location === 'string' && bowl.location.trim() !== '') {
                         geocodeAddress(geocoder, map, bowl);
                     } else {
