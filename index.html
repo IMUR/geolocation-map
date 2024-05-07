@@ -58,10 +58,10 @@
             }
         }
 
-        function fetchBowlLocations(map) {
-    fetch("https://pottysnitch.com/_functions/bowls")
-        .then(response => response.json())
-        .then(data => {
+            function fetchBowlLocations(map) {
+                fetch("https://pottysnitch.com/_functions/bowls")
+                    .then(response => response.json())
+                    .then(data => {
             const geocoder = new google.maps.Geocoder();
             data.bowls.forEach(bowl => {
                 // Ensure we have a formatted address and it's not empty
@@ -81,7 +81,7 @@ function geocodeAddress(geocoder, map, formattedAddress) {
             new google.maps.Marker({
                 position: results[0].geometry.location,
                 map: map,
-                title: formattedAddress // Changed to display the formatted address
+                title: formattedAddress
             });
         } else {
             console.error('Geocode was not successful for the following reason: ' + status);
