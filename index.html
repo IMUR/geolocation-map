@@ -39,7 +39,6 @@
 
                 }, function(error) {
                     console.error("Geolocation error:", error);
-                    // Fallback location if geolocation fails
                     const defaultLocation = { lat: 37.7749, lng: -122.4194 }; // Example: San Francisco
                     const map = new google.maps.Map(document.getElementById('map'), {
                         zoom: 12,
@@ -70,7 +69,7 @@
         }
 
         function geocodeAddress(geocoder, map, bowl) {
-            geocoder.geocode({ 'address': bowl.address }, function(results, status) {
+            geocoder.geocode({ 'address': bowl.location }, function(results, status) {
                 if (status === 'OK') {
                     new google.maps.Marker({
                         position: results[0].geometry.location,
