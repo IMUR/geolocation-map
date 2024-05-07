@@ -47,6 +47,9 @@
                     fetchBowlLocations(map);
                 });
             } else {
+                console.log("Initializing map...");
+                console.log("User location: ", userLocation);
+                console.log("Geocoding address: ", bowl.location);
                 console.log("Geolocation is not supported by this browser.");
             }
         }
