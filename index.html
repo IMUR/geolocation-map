@@ -59,34 +59,36 @@
         }
 
         function fetchBowlLocations(map) {
-            fetch("https://pottysnitch.com/_functions/bowls")
-                .then(response => response.json())
-                .then(data => {
-                    const geocoder = new google.maps.Geocoder();
-                    data.bowls.forEach(bowl => {
-                        if (typeof bowl.location === 'string' && bowl.location.trim() !== '') {
-                            geocodeAddress(geocoder, map, bowl);
-                        } else {
-                            console.error('Invalid or empty address:', bowl.location);
-                        }
-                    });
-                })
-                .catch(error => console.error('Error fetching bowls:', error));
-        }
-
-        function geocodeAddress(geocoder, map, bowl) {
-            geocoder.geocode({ 'address': bowl.location }, function(results, status) {
-                if (status === 'OK') {
-                    new google.maps.Marker({
-                        position: results[0].geometry.location,
-                        map: map,
-                        title: bowl.name
-                    });
+    fetch("https://pottysnitch.com/_functions/bowls")
+        .then(response => response.json())
+        .then(data => {
+            const geocoder = new google.maps.Geocoder();
+            data.bowls.forEach(bowl => {
+                // Ensure we have a formatted address and it's not empty
+                if (bowl.formatted && typeof bowl.formatted === 'string' && bowl.formatted.trim() !== '') {
+                    geocodeAddress(geocoder, map, bowl.formatted);
                 } else {
-                    console.error('Geocode was not successful for the following reason: ' + status);
+                    console.error('Invalid or empty address:', bowl);
                 }
             });
+        })
+        .catch(error => console.error('Error fetching bowls:', error));
+}
+
+function geocodeAddress(geocoder, map, formattedAddress) {
+    geocoder.geocode({ 'address': formattedAddress }, function(results, status) {
+        if (status === 'OK') {
+            new google.maps.Marker({
+                position: results[0].geometry.location,
+                map: map,
+                title: formattedAddress // Changed to display the formatted address
+            });
+        } else {
+            console.error('Geocode was not successful for the following reason: ' + status);
         }
+    });
+}
+
     </script>
 </body>
 </html>
