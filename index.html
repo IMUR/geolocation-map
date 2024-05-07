@@ -1,24 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
     <title>Geolocation Map</title>
-    <!-- Updated Content-Security-Policy -->
-    <meta http-equiv="Content-Security-Policy" content="
-        default-src 'self';
-        script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://maps.gstatic.com;
-        style-src 'self' 'unsafe-inline';
-        connect-src 'self' https://maps.googleapis.com;
-        worker-src 'self' blob:;
-        img-src 'self' data: https://maps.googleapis.com https://maps.gstatic.com;
-    ">
     <style>
         #map {
-            height: 100%; /* Full height of the browser window */
-            width: 100%; /* Full width of the browser window */
+            height: 400px;  /* Adjust size as necessary */
+            width: 100%;
         }
     </style>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkatzMQ_hr48LwdIIJZqIbzZsUOByaadY&libraries=places&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkatzMQ_hr48LwdIIJZqIbzZsUOByaadY&callback=initMap" async defer></script>
 </head>
 <body>
     <div id="map"></div>
@@ -30,6 +20,7 @@
                         lat: position.coords.latitude,
                         lng: position.coords.longitude
                     };
+
                     const map = new google.maps.Map(document.getElementById('map'), {
                         zoom: 12,
                         center: userLocation
@@ -40,51 +31,17 @@
                         map: map,
                         title: "Your Location"
                     });
-
-                    fetchBowlLocations(map);
                 }, function(error) {
-                    console.error("Geolocation error:", error);
-                    setDefaultLocation();
+                    console.error("Error Code = " + error.code + " - " + error.message);
+                    const defaultLocation = { lat: 37.7749, lng: -122.4194 }; // Example: San Francisco
+                    const map = new google.maps.Map(document.getElementById('map'), {
+                        zoom: 12,
+                        center: defaultLocation
+                    });
                 });
             } else {
                 console.log("Geolocation is not supported by this browser.");
-                setDefaultLocation();
             }
-
-            function setDefaultLocation() {
-                const defaultLocation = { lat: 37.7749, lng: -122.4194 }; // San Francisco as a fallback
-                const map = new google.maps.Map(document.getElementById('map'), {
-                    zoom: 12,
-                    center: defaultLocation
-                });
-                fetchBowlLocations(map);
-            }
-        }
-
-        function fetchBowlLocations(map) {
-            fetch("https://pottysnitch.com/_functions/bowls")
-                .then(response => response.json())
-                .then(data => {
-                    const geocoder = new google.maps.Geocoder();
-                    data.bowls.forEach(bowl => {
-                        geocodeAddress(geocoder, map, bowl.formatted);
-                    });
-                })
-                .catch(error => console.error('Error fetching bowls:', error));
-        }
-
-        function geocodeAddress(geocoder, map, formattedAddress) {
-            geocoder.geocode({ 'address': formattedAddress }, function(results, status) {
-                if (status === 'OK') {
-                    new google.maps.Marker({
-                        position: results[0].geometry.location,
-                        map: map,
-                        title: formattedAddress
-                    });
-                } else {
-                    console.error('Geocode was not successful for the following reason: ' + status);
-                }
-            });
         }
     </script>
 </body>
