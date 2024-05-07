@@ -15,46 +15,48 @@
     <div id="map"></div>
     <script>
         function initMap() {
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(success, error);
-        } else {
-            console.log("Geolocation is not supported by this browser.");
-            setDefaultLocation();
+            // Check for geolocation support
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(success, error);
+            } else {
+                console.log("Geolocation is not supported by this browser.");
+                setDefaultLocation();
+            }
+
+            function success(position) {
+                const userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                const map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 12,
+                    center: userLocation
+                });
+
+                // Use AdvancedMarkerElement instead of the deprecated Marker
+                new google.maps.marker.AdvancedMarkerElement({
+                    position: userLocation,
+                    map: map,
+                    title: "Your Location"
+                });
+
+                fetchBowlLocations(map);
+            }
+
+            function error(err) {
+                console.error("Geolocation error:", err);
+                setDefaultLocation();
+            }
+
+            function setDefaultLocation() {
+                const defaultLocation = { lat: 37.7749, lng: -122.4194 }; // San Francisco as a fallback
+                const map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 12,
+                    center: defaultLocation
+                });
+                fetchBowlLocations(map);
+            }
         }
-
-        function success(position) {
-            const userLocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            };
-            const map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 12,
-                center: userLocation
-            });
-
-            new google.maps.marker.AdvancedMarkerElement({
-                position: userLocation,
-                map: map,
-                title: "Your Location"
-            });
-
-            fetchBowlLocations(map);
-        }
-
-        function error(err) {
-            console.error("Geolocation error:", err);
-            setDefaultLocation();
-        }
-
-        function setDefaultLocation() {
-            const defaultLocation = { lat: 37.7749, lng: -122.4194 };
-            const map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 12,
-                center: defaultLocation
-            });
-            fetchBowlLocations(map);
-        }
-    }
 
         function fetchBowlLocations(map) {
             fetch("https://pottysnitch.com/_functions/bowls")
