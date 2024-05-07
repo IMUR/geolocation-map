@@ -39,7 +39,7 @@
 
                 }, function(error) {
                     console.error("Geolocation error:", error);
-                    const defaultLocation = { lat: 37.7749, lng: -122.4194 }; // Example: San Francisco
+                    const defaultLocation = { lat: 37.7749, lng: -122.4194 }; // Fallback location if geolocation fails
                     const map = new google.maps.Map(document.getElementById('map'), {
                         zoom: 12,
                         center: defaultLocation
@@ -47,25 +47,22 @@
                     fetchBowlLocations(map);
                 });
             } else {
-                console.log("Initializing map...");
-                console.log("User location: ", userLocation);
-                console.log("Geocoding address: ", bowl.location);
                 console.log("Geolocation is not supported by this browser.");
             }
         }
 
         function fetchBowlLocations(map) {
             fetch("https://pottysnitch.com/_functions/bowls")
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 const geocoder = new google.maps.Geocoder();
                 data.bowls.forEach(bowl => {
-                    geocodeAddress(geocoder, map, bowl);
+                    // Check if address is a string and not empty
+                    if (typeof bowl.location === 'string' && bowl.location.trim() !== '') {
+                        geocodeAddress(geocoder, map, bowl);
+                    } else {
+                        console.error('Invalid or empty address:', bowl.location);
+                    }
                 });
             })
             .catch(error => console.error('Error fetching bowls:', error));
